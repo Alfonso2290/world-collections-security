@@ -1,5 +1,6 @@
 package security.world_collections_security.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -7,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping
+@RequestMapping("/security")
+@RequiredArgsConstructor
 public class SecurityController {
 
 	@PostMapping("/enrout/{path-backend}")

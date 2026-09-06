@@ -1,5 +1,6 @@
 package security.world_collections_security.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -9,13 +10,10 @@ import reactor.core.publisher.Mono;
 import security.world_collections_security.service.SecurityService;
 
 @Service
+@RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
 
 	private final WebClient webClient;
-
-	public SecurityServiceImpl(WebClient webClient) {
-		this.webClient = webClient;
-	}
 
 	//Response Generico
 	public Mono<ResponseEntity<byte[]>> redirect(
