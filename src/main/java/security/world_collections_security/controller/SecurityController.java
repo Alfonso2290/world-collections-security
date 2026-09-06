@@ -1,0 +1,30 @@
+package security.world_collections_security.controller;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+
+@RestController
+@RequestMapping
+public class SecurityController {
+
+	@PostMapping("/enrout/{path-backend}")
+	public Mono<ResponseEntity<byte[]>> request(
+			@PathVariable("path-backend") String backend,
+			ServerHttpRequest request,
+			@RequestBody(required = false) byte[] body) {
+
+		HttpHeaders headers = request.getHeaders();
+
+		String token = headers.getFirst(HttpHeaders.AUTHORIZATION);
+
+		// 1. Validar token
+		// 2. Obtener usuario / role
+		// 3. Determinar backend
+		// 4. Reenviar petición
+
+		return null;
+	}
+}
