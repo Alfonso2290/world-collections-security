@@ -6,9 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import security.world_collections_security.service.SecurityService;
 
 @Service
-public class SecurityServiceImpl {
+public class SecurityServiceImpl implements SecurityService {
 
 	private final WebClient webClient;
 
