@@ -1,22 +1,24 @@
-package security.world_collections_security.entity.sql;
+package security.world_collections_security.model.dto;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
-@Table(name = "UserAccess", schema = "dbo")
 @Getter
 @Setter
-public class UserAccess {
-	@Id
-	@Column(name = "id", nullable = false)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class UserAccessDto {
 
-	@Column(name = "[user]")
-	private String user;
+	private Long id;
+	private String userName;
 	private String password;
 	private String role;
+	private String validate;
 
+	public UserAccessDto(String userName, String password, String role) {
+		this.userName = userName;
+		this.password = password;
+		this.role = role;
+	}
+
+	public UserAccessDto() {
+	}
 }

@@ -1,21 +1,45 @@
 package security.world_collections_security.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import security.world_collections_security.repository.UserAccessRepository;
 import security.world_collections_security.service.SecurityService;
 
 @Service
 @RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
 
-	private final WebClient webClient;
+	private final WebClient client;
+	private final UserAccessRepository userAccessRepository;
 
-	//Response Generico
+
+	@Override
+	public Mono<String> decryptToken(String authorization) {
+		return client.post()
+				.uri(uriBuilder -> uriBuilder
+						.path("/token/decrypt")
+						.queryParam("token", authorization)
+						.build())
+				.accept(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE))
+				.contentType(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE))
+				//.exchangeToMono(response -> response.bodyToMono(String.class));
+				.retrieve().bodyToMono(String.class);
+	}
+
+	//Posible mejora
+	@Override
+	public Mono<String> validateUser(String user, String password){
+		return userAccessRepository.findFirstByUserNameAndPassword(user, password)
+				.flatMap(userAccess -> {
+					if(userAccess.getUserName().equals(user) && userAccess.getPassword().equals(password)) return Mono.just(userAccess.getRole());
+					else return Mono.empty();
+				});
+	}
+
+	/*//Response Generico
 	public Mono<ResponseEntity<byte[]>> redirect(
 			String url, //path-variable
 			HttpMethod method,//POST, GET
@@ -48,5 +72,5 @@ public class SecurityServiceImpl implements SecurityService {
 											.body(responseBody);
 								})
 				);
-	}
+	}*/
 }

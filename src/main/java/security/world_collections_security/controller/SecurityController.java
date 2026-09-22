@@ -12,9 +12,9 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class SecurityController {
 
-	@PostMapping("/enrout/{path-backend}")
+	/*@PostMapping("/enrout/{path-backend}")
 	public Mono<ResponseEntity<byte[]>> request(
-			@PathVariable("path-backend") String backend,
+			@PathVariable("path-backend") String backend, //aca seria todo el path completo ejemplo "user/validate/user"
 			ServerHttpRequest request,
 			@RequestBody(required = false) byte[] body) {
 
@@ -28,5 +28,5 @@ public class SecurityController {
 		// 4. Reenviar petición
 
 		return null;
-	}
+	}*/
 }
