@@ -12,8 +12,6 @@ public class WebClientConfig {
 		return WebClient.builder().build();
 	}*/
 
-
-	//Mejora: No solo se debe utilizar este path base
 	@Bean
 	public WebClient webClient() {
 		return WebClient.create("http://world.local:8082");

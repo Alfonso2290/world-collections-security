@@ -15,7 +15,6 @@ public class SecurityServiceImpl implements SecurityService {
 	private final WebClient client;
 	private final UserAccessRepository userAccessRepository;
 
-
 	@Override
 	public Mono<String> decryptToken(String authorization) {
 		return client.post()
@@ -29,13 +28,16 @@ public class SecurityServiceImpl implements SecurityService {
 				.retrieve().bodyToMono(String.class);
 	}
 
-	//Posible mejora
 	@Override
 	public Mono<String> validateUser(String user, String password){
 		return userAccessRepository.findFirstByUserNameAndPassword(user, password)
 				.flatMap(userAccess -> {
-					if(userAccess.getUserName().equals(user) && userAccess.getPassword().equals(password)) return Mono.just(userAccess.getRole());
-					else return Mono.empty();
+					if(userAccess.getUserName().equals(user) && userAccess.getPassword().equals(password)) {
+						return Mono.just(userAccess.getRole());
+					}
+					else {
+						return Mono.empty();
+					}
 				});
 	}
 
