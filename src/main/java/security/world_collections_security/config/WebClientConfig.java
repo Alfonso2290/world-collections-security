@@ -13,7 +13,13 @@ public class WebClientConfig {
 	}*/
 
 	@Bean
+	public WebClient webClient(WebClient.Builder builder) {
+		return builder.build();
+	}
+
+	/*@Bean
 	public WebClient webClient() {
 		return WebClient.create("http://world.local:8082");
-	}
+		//return WebClient.create("http://localhost:8082");
+	}*/
 }

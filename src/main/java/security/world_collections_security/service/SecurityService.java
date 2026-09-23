@@ -10,5 +10,8 @@ public interface SecurityService {
 
 	Mono<String> decryptToken(String authorization);
 
-	Mono<String> validateUser(String user, String password);
+	Mono<String> validateTokenUser(String user, String password);
+
+	//TODO Los parametros deben ser genéricos, no dependiendo de un endpoint en especifico
+	Mono<Object> validateUser(String user, String password, String pathService);
 }
