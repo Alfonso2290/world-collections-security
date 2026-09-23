@@ -22,7 +22,7 @@ public class SecurityServiceImpl implements SecurityService {
 		return client.post()
 				.uri(uriBuilder -> uriBuilder
 						.scheme("http")
-						.host("world.local") //TODO cambiar a localhost cuando pruebe desde kubernetes
+						.host("world.local") //TODO cambiar a world-collections-token-service-private cuando pruebe desde kubernetes
 						.port(8082)
 						.path("/token/decrypt")
 						.queryParam("token", authorization)
@@ -56,8 +56,8 @@ public class SecurityServiceImpl implements SecurityService {
 							queryParams.forEach(uriBuilder::queryParam);
 							return uriBuilder
 								.scheme("http")
-								.host("localhost")
-								.port(8083) //TODO pendiente de dinamizar //cambiar a 8080 cuando pruebe desde kubernetes
+								.host("localhost") //TODO cambiar a world-control-collections-service-private cuando pruebe desde kubernetes
+								.port(8083) //TODO pendiente de dinamizar //cambiar a 8081 cuando pruebe desde kubernetes
 								.path("/" + pathService)
 								.build();
 						})
