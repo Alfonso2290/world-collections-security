@@ -4,5 +4,6 @@ public class Constants {
 	public static final String SPLIT_SPACE = " ";
 	public static final String SPLIT_INTERMEDIATE_SCRIPT = "-";
 	public static final String HEADER_AUTHORIZATION = "Authorization";
+	public static final String PREFIX_SERVICE_NAME = "-service-private";
 
 }
