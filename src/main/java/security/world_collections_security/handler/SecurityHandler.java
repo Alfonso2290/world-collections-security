@@ -43,34 +43,11 @@ public class SecurityHandler {
 				.onErrorResume(SecurityHelper::errorHandler);
 	}
 
-	//Hacerlo más genérico: envié siempre el relativePath
+	//TODO Nunca llega a este onErrorResume -> arreglar
 	public Mono<ServerResponse> redirectRequest(ServerRequest request){
-		String relativePath = request.path().substring("/security/".length());
-		switch (relativePath) {
-			case "user/validate/user" -> {
-				return validateUser(request, relativePath);
-			}
-			case "others" -> {
-				return ServerResponse.noContent().build();
-			}
-			default -> {
-				return ServerResponse.notFound().build();
-			}
-		}
-	}
-
-	Mono<ServerResponse> validateUser(ServerRequest request, String pathService){
-//		System.out.println("User Handler: " + request.queryParams().get("user").get(0));
-//		System.out.println("Password Handler: " + request.queryParams().get("password").get(0));
-		//TODO Los parametros deben ser genéricos, no dependiendo de un endpoint en especifico
-		return securityService.validateUser(
-						request.queryParams().get("user").get(0),
-						request.queryParams().get("password").get(0),
-						pathService)
-				.flatMap(object -> {
-					System.out.println("Object: " + object.toString()); // Poner en logger.info
-					return ServerResponse.ok().bodyValue(object);
-				})
+		return securityService.redirectRequest(request, request.path().substring("/security/".length()), request.queryParams())
+				.flatMap(object -> ServerResponse.ok().bodyValue(object))
+				.switchIfEmpty(ServerResponse.notFound().build())
 				.onErrorResume(error -> {
 					WebClientResponseException errorClient = (WebClientResponseException) error;
 					if(errorClient.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {

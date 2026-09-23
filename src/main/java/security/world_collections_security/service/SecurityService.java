@@ -1,8 +1,7 @@
 package security.world_collections_security.service;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 public interface SecurityService {
@@ -12,6 +11,5 @@ public interface SecurityService {
 
 	Mono<String> validateTokenUser(String user, String password);
 
-	//TODO Los parametros deben ser genéricos, no dependiendo de un endpoint en especifico
-	Mono<Object> validateUser(String user, String password, String pathService);
+	Mono<Object> redirectRequest(ServerRequest request, String pathService, MultiValueMap<String, String> queryParams);
 }

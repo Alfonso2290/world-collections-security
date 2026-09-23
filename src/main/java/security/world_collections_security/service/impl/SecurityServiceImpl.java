@@ -1,10 +1,11 @@
 package security.world_collections_security.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import security.world_collections_security.repository.UserAccessRepository;
 import security.world_collections_security.service.SecurityService;
@@ -12,9 +13,6 @@ import security.world_collections_security.service.SecurityService;
 @Service
 @RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
-
-//	@Value("${application.base-path.world-control-collections}")
-//	String basePathWorldControlCollections;
 
 	private final WebClient client;
 	private final UserAccessRepository userAccessRepository;
@@ -24,7 +22,7 @@ public class SecurityServiceImpl implements SecurityService {
 		return client.post()
 				.uri(uriBuilder -> uriBuilder
 						.scheme("http")
-						.host("world.local") //cambiar a localhost cuando pruebe desde kubernetes
+						.host("world.local") //TODO cambiar a localhost cuando pruebe desde kubernetes
 						.port(8082)
 						.path("/token/decrypt")
 						.queryParam("token", authorization)
@@ -47,28 +45,34 @@ public class SecurityServiceImpl implements SecurityService {
 				});
 	}
 
-	//TODO Los parametros deben ser genéricos, no dependiendo de un endpoint en especifico
-	//Hacer más generico --> Enviar:
-	// - port dinamico
-	// - queryParams si existe
-	// - body si existe
-	// - headers si existe
+	//TODO Ver logica para dinamizar el puerto, ya que cada microservicio en mi kubernetes va con puerto distinto
 	@Override
-	public Mono<Object> validateUser(String user, String password, String pathService) {
-		/*System.out.println(basePathWorldControlCollections.concat(pathService));
-		System.out.println("User/Password: " + user + "/" + password);*/
-		return client.get()
-				.uri(uriBuilder -> uriBuilder
-						.scheme("http")
-						.host("localhost")
-						.port(8083) //cambiar a 8080 cuando pruebe desde kubernetes
-						.path(pathService)
-						.queryParam("user", user)
-						.queryParam("password", password)
-						.build())
-						.accept(MediaType.APPLICATION_JSON)
-				.retrieve()
-				.bodyToMono(Object.class);
+	public Mono<Object> redirectRequest(ServerRequest request, String pathService, MultiValueMap<String, String> queryParams) {
+		return	request.bodyToMono(String.class)
+					.defaultIfEmpty("")
+					.flatMap(body-> {
+						WebClient.RequestBodySpec requestBodySpec = client.method(request.method())
+						.uri(uriBuilder -> {
+							queryParams.forEach(uriBuilder::queryParam);
+							return uriBuilder
+								.scheme("http")
+								.host("localhost")
+								.port(8083) //TODO pendiente de dinamizar //cambiar a 8080 cuando pruebe desde kubernetes
+								.path("/" + pathService)
+								.build();
+						})
+						.headers(headers -> headers.addAll(request.headers().asHttpHeaders()));
+						if(body.isEmpty()){
+							return requestBodySpec
+									.retrieve()
+									.bodyToMono(Object.class);
+							}
+						return requestBodySpec
+							.bodyValue(body)
+							.accept(MediaType.APPLICATION_JSON)
+							.retrieve()
+							.bodyToMono(Object.class);
+					});
 	}
 
 	/*//Response Generico

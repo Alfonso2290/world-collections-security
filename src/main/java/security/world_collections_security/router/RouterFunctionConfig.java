@@ -14,6 +14,9 @@ public class RouterFunctionConfig {
 	@Bean
 	RouterFunction<ServerResponse> routerConfig(SecurityHandler handler){
 		return RouterFunctions.route(
-				RequestPredicates.POST("/security/**"), handler::validateTokenAndRedirectRequest);
+				RequestPredicates.GET("/security/**"), handler::validateTokenAndRedirectRequest)
+				.andRoute(RequestPredicates.POST("/security/**"), handler::validateTokenAndRedirectRequest)
+				.andRoute(RequestPredicates.PUT("/security/**"), handler::validateTokenAndRedirectRequest)
+				.andRoute(RequestPredicates.DELETE("/security/**"), handler::validateTokenAndRedirectRequest);
 	}
 }
