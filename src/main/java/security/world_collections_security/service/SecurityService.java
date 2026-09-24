@@ -11,5 +11,5 @@ public interface SecurityService {
 
 	Mono<String> validateTokenUser(String user, String password);
 
-	Mono<Object> redirectRequest(ServerRequest request, String pathService, MultiValueMap<String, String> queryParams);
+	Mono<Object> redirectRequest(ServerRequest request, String pathService, MultiValueMap<String, String> queryParams, Object responseDefault);
 }

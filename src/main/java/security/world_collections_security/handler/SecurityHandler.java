@@ -18,6 +18,7 @@ import static security.world_collections_security.helper.Constants.*;
 public class SecurityHandler {
 
 	private final SecurityService securityService;
+	public static final Object OBJECT_EMPTY = new Object();
 
 	public Mono<ServerResponse> validateTokenAndRedirectRequest(ServerRequest request){
 		ServerRequest.Headers headers = request.headers();
@@ -45,8 +46,13 @@ public class SecurityHandler {
 
 	//TODO Nunca llega a este onErrorResume -> arreglar
 	public Mono<ServerResponse> redirectRequest(ServerRequest request){
-		return securityService.redirectRequest(request, request.path().substring("/security/".length()), request.queryParams())
-				.flatMap(object -> ServerResponse.ok().bodyValue(object))
+		return securityService.redirectRequest(request, request.path().substring("/security/".length()), request.queryParams(), OBJECT_EMPTY)
+				.flatMap(object -> {
+					if(object == OBJECT_EMPTY) {
+						return ServerResponse.ok().build();
+					}
+					return ServerResponse.ok().bodyValue(object);
+				})
 				.switchIfEmpty(ServerResponse.notFound().build())
 				.onErrorResume(error -> {
 					WebClientResponseException errorClient = (WebClientResponseException) error;

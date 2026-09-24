@@ -12,6 +12,7 @@ import security.world_collections_security.repository.UserAccessRepository;
 import security.world_collections_security.service.SecurityService;
 
 import static security.world_collections_security.helper.Constants.*;
+
 @Service
 @RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
@@ -24,7 +25,7 @@ public class SecurityServiceImpl implements SecurityService {
 		return client.post()
 				.uri(uriBuilder -> uriBuilder
 						.scheme("http")
-						.host(ServiceEnum.WORLD_COLLECTIONS_TOKEN.getName().concat(PREFIX_SERVICE_NAME)) //TODO cambiar a world-collections-token-service-private cuando pruebe desde kubernetes
+						.host(ServiceEnum.WORLD_COLLECTIONS_TOKEN.getName().concat(PREFIX_SERVICE_NAME))
 						.port(8082)
 						.path("/token/decrypt")
 						.queryParam("token", authorization)
@@ -47,14 +48,9 @@ public class SecurityServiceImpl implements SecurityService {
 				});
 	}
 
-	//TODO Ver logica para dinamizar el puerto y host, ya que cada microservicio en mi kubernetes va con puerto distinto
 	@Override
-	public Mono<Object> redirectRequest(ServerRequest request, String pathService, MultiValueMap<String, String> queryParams) {
+	public Mono<Object> redirectRequest(ServerRequest request, String pathService, MultiValueMap<String, String> queryParams, Object responseDefault) {
 		String hostNameOrigin = pathService.split("/")[0];
-		String hostName = hostNameOrigin.concat(PREFIX_SERVICE_NAME);
-		System.out.println("Test Service Name :" + hostName);
-
-		String port = ServiceEnum.getValuePortFromName(hostNameOrigin);
 		return	request.bodyToMono(String.class)
 					.defaultIfEmpty("")
 					.flatMap(body-> {
@@ -63,8 +59,8 @@ public class SecurityServiceImpl implements SecurityService {
 							queryParams.forEach(uriBuilder::queryParam);
 							return uriBuilder
 								.scheme("http")
-								.host(hostName) //TODO Penediente de dinamizar //cambiar a world-control-collections-service-private cuando pruebe desde kubernetes
-								.port(port) //TODO pendiente de dinamizar //cambiar a 8081 cuando pruebe desde kubernetes
+								.host(hostNameOrigin.concat(PREFIX_SERVICE_NAME))
+								.port(ServiceEnum.getValuePortFromName(hostNameOrigin))
 								.path("/" + pathService)
 								.build();
 						})
@@ -72,14 +68,16 @@ public class SecurityServiceImpl implements SecurityService {
 						if(body.isEmpty()){
 							return requestBodySpec
 									.retrieve()
-									.bodyToMono(Object.class);
+									.bodyToMono(Object.class)
+									.defaultIfEmpty(responseDefault);
 							}
 						return requestBodySpec
 							.contentType(MediaType.APPLICATION_JSON)
 							.bodyValue(body)
 							.accept(MediaType.APPLICATION_JSON)
 							.retrieve()
-							.bodyToMono(Object.class);
+							.bodyToMono(Object.class)
+							.defaultIfEmpty(responseDefault);
 					});
 	}
 
