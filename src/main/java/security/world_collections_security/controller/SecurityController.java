@@ -7,9 +7,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-@RestController
+/*@RestController
 @RequestMapping("/security")
-@RequiredArgsConstructor
+@RequiredArgsConstructor*/
 public class SecurityController {
 
 	/*@PostMapping("/enrout/{path-backend}")

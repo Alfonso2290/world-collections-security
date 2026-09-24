@@ -75,6 +75,7 @@ public class SecurityServiceImpl implements SecurityService {
 									.bodyToMono(Object.class);
 							}
 						return requestBodySpec
+							.contentType(MediaType.APPLICATION_JSON)
 							.bodyValue(body)
 							.accept(MediaType.APPLICATION_JSON)
 							.retrieve()
