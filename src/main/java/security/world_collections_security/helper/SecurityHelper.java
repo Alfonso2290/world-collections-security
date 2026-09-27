@@ -6,8 +6,14 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Map;
 
 public class SecurityHelper {
@@ -35,5 +41,23 @@ public class SecurityHelper {
 		map.put("Message", message);
 		map.put("Timestamp", new Date());
 		return map;
+	}
+
+	public static String hash(String value) throws Exception {
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+		return HexFormat.of().formatHex(hash);
+	}
+
+	public static Boolean calculateTimeOfLiveToken(String dateTime, Integer timeLiveToken){
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime localDateTime = LocalDateTime.parse(dateTime, formatter);
+		LocalDateTime localDateTimeNow = LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter);
+
+		long differentDateTimeInSeconds = Duration.between(localDateTime, localDateTimeNow).toSeconds();
+		if(timeLiveToken > differentDateTimeInSeconds){
+			return Boolean.TRUE;
+		}
+		return Boolean.FALSE;
 	}
 }

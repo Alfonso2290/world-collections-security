@@ -53,6 +53,13 @@
 			<version>1.18.20.0</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!--Conexion a Redis-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+			<version>3.4.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
