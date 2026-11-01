@@ -11,10 +11,10 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import security.world_collections_security.entity.redis.SecurityToken;
-import security.world_collections_security.entity.sql.RequestAccess;
 import security.world_collections_security.helper.SecurityHelper;
 import security.world_collections_security.model.dto.RequestAccessDto;
 import security.world_collections_security.model.dto.UserAccessDto;
+import security.world_collections_security.model.enums.RequestAccessStatus;
 import security.world_collections_security.service.RedisService;
 import security.world_collections_security.service.RequestAccessService;
 import security.world_collections_security.service.SecurityService;
@@ -62,12 +62,17 @@ public class SecurityHandler {
 							.flatMap(isPathCreateAccount -> {
 								if(Boolean.TRUE.equals(isPathCreateAccount)){
 									return requestAccessService.searchRequestAccess(userAccessDto.getUserName())
-											.switchIfEmpty(requestAccessService.saveRequestAccess(buildRequestAccessDto(userAccessDto)));
-									//Pendiente: Si es true no deberia ir a validateTokenUser : solo debe redirecionar independientemente si registra o no en RequestAccess
+											.switchIfEmpty(requestAccessService.saveRequestAccess(buildRequestAccessDto(userAccessDto)))
+											.map(response -> Boolean.TRUE);
 								}
-								return Mono.just(new RequestAccess());
+								return Mono.just(Boolean.FALSE);
 							})
-							.flatMap(responseRequestAccess -> this.validateTokenUser(userAccessDto, request, accessToken, pathRelative));
+							.flatMap(responseFlowValidate -> {
+								if(Boolean.TRUE.equals(responseFlowValidate)){
+									return this.redirectRequest(request, pathRelative);
+								}
+								return this.validateTokenUser(userAccessDto, request, accessToken, pathRelative);
+							});
 
 				})
 				.switchIfEmpty(ServerResponse.badRequest().build())
@@ -81,10 +86,10 @@ public class SecurityHandler {
 
 	private RequestAccessDto buildRequestAccessDto(UserAccessDto userAccessDto){
 		RequestAccessDto requestAccessDto = new RequestAccessDto();
-		requestAccessDto.setCreatedOn(null); // Pendiente actualizar
+		requestAccessDto.setCreatedOn(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		requestAccessDto.setPassword(userAccessDto.getPassword());
 		requestAccessDto.setRole(userAccessDto.getRole());
-		requestAccessDto.setStatus("REQUEST"); // Pendiente actualizar: ponerlo en Util
+		requestAccessDto.setStatus(RequestAccessStatus.REQUEST.getName());
 		requestAccessDto.setUser(userAccessDto.getUserName());
 		return requestAccessDto;
 	}
