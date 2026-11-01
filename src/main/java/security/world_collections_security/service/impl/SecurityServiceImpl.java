@@ -80,39 +80,4 @@ public class SecurityServiceImpl implements SecurityService {
 							.defaultIfEmpty(responseDefault);
 					});
 	}
-
-	/*//Response Generico
-	public Mono<ResponseEntity<byte[]>> redirect(
-			String url, //path-variable
-			HttpMethod method,//POST, GET
-			HttpHeaders headers,
-			byte[] body) {
-
-		return webClient
-				.method(method)
-				.uri(url)
-				.headers(httpHeaders -> {
-					httpHeaders.addAll(headers);
-				})
-				.bodyValue(body != null ? body : new byte[0])
-				.exchangeToMono(response ->
-						response.bodyToMono(byte[].class)
-								.defaultIfEmpty(new byte[0])
-								.map(responseBody -> {
-
-									HttpHeaders responseHeaders =
-											new HttpHeaders();
-
-									responseHeaders.putAll(
-											response.headers()
-													.asHttpHeaders()
-									);
-
-									return ResponseEntity
-											.status(response.statusCode())
-											.headers(responseHeaders)
-											.body(responseBody);
-								})
-				);
-	}*/
 }
